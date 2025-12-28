@@ -51,20 +51,24 @@ A production-ready AI-powered email intelligence system with real SMTP/IMAP inte
 
 2. **Set up Virtual Environment**
    ```bash
-   python3 -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
+   # Create virtual environment
+   python -m venv venv
 
-3. **Install Dependencies**
-   ```bash
+   # Activate:
+   source venv/bin/activate       # Mac/Linux
+   .\venv\Scripts\activate        # Windows
+
+   # Install:
    pip install -r requirements.txt
    ```
 
 4. **Environment Configuration**
    ```bash
-   cp .env.example .env
-   # Open .env and set your preferences (e.g., USE_OLLAMA=True)
+   # Copy config file
+   cp .env.example .env           # Mac/Linux
+   copy .env.example .env         # Windows
    ```
+   *Edit `.env` with your App Password and settings.*
 
 ---
 
@@ -79,8 +83,8 @@ A production-ready AI-powered email intelligence system with real SMTP/IMAP inte
 2. **Login**
    Enter your email and the **App Password** you generated.
 
-3. **Start Monitoring**
-   Enable **Auto-Reply** from the dashboard. The system will start checking your inbox every 30 seconds (default).
+2. **Auto-Reply**
+   Toggle **ON** in the dashboard to start the AI agent (checks every 30s).
 
 ---
 

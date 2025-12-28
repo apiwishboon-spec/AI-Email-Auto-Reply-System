@@ -346,20 +346,20 @@ def check_now():
             }), 401
         
         session_id = session.sid if hasattr(session, 'sid') else session.get('email')
-        email_service = email_services.get(session_id)
+        monitor = email_monitors.get(session_id)
         
-        if not email_service:
+        if not monitor:
             return jsonify({
                 'success': False,
-                'message': 'Service not initialized'
+                'message': 'Monitor not initialized'
             }), 500
         
-        new_emails = email_service.check_new_emails(Config.MAX_EMAILS_PER_CHECK)
+        processed_count = monitor.check_now()
         
         return jsonify({
             'success': True,
             'message': 'Check completed',
-            'new_emails': len(new_emails)
+            'new_emails': processed_count
         })
         
     except Exception as e:

@@ -123,7 +123,7 @@ class EmailService:
     
     def check_new_emails(self, max_emails=10):
         """
-        Check for new unread emails
+        Check for new emails using a robust search strategy
         
         Args:
             max_emails: Maximum number of emails to process
@@ -140,36 +140,44 @@ class EmailService:
                 # Select inbox
                 self.imap_connection.select('INBOX')
                 
-                # Search for unread emails
-                status, messages = self.imap_connection.search(None, 'UNSEEN')
+                # Strategy 1: Search for UNSEEN emails
+                status, unseen_messages = self.imap_connection.search(None, 'UNSEEN')
+                unseen_ids = unseen_messages[0].split() if status == 'OK' else []
                 
-                if status != 'OK':
-                    logger.error("Failed to search for emails")
+                # Strategy 2: Get recent email IDs (last 20) regardless of seen status
+                # This handles cases where emails are marked as read by other clients
+                status, all_messages = self.imap_connection.search(None, 'ALL')
+                recent_ids = all_messages[0].split()[-20:] if status == 'OK' else []
+                
+                # Combine and deduplicate IDs, preserving order (most recent last)
+                # We use a set for efficiency but convert back to sorted list
+                combined_ids = sorted(list(set(unseen_ids) | set(recent_ids)), key=lambda x: int(x))
+                
+                if not combined_ids:
+                    logger.info("No candidate emails found")
                     return []
                 
-                email_ids = messages[0].split()
-                
-                if not email_ids:
-                    logger.info("No new emails found")
-                    return []
-                
-                # Limit number of emails to process
-                email_ids = email_ids[-max_emails:]
-                logger.info(f"Found {len(email_ids)} unread email IDs: {email_ids}")
+                # Limit to max_emails, taking the most recent ones
+                email_ids = combined_ids[-max_emails:]
+                logger.info(f"Checking {len(email_ids)} candidate email IDs: {email_ids}")
                 
                 new_emails = []
                 
                 for email_id in email_ids:
+                    # We fetch metadata first or just fetch internal to check message_id
                     email_data = self._fetch_email_internal(email_id)
+                    
                     if email_data:
-                        if email_data['message_id'] not in self.processed_emails:
+                        msg_id = email_data['message_id']
+                        if msg_id not in self.processed_emails:
+                            logger.info(f"New unprocessed email found: {msg_id} (ID: {email_id.decode()})")
                             new_emails.append(email_data)
                         else:
-                            logger.debug(f"Email {email_data['message_id']} already processed")
+                            logger.debug(f"Email {msg_id} already in processed set")
                     else:
                         logger.warning(f"Failed to fetch email data for ID {email_id}")
                 
-                logger.info(f"Found {len(new_emails)} new unprocessed emails")
+                logger.info(f"Found {len(new_emails)} new unprocessed emails to process")
                 return new_emails
             
         except Exception as e:

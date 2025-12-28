@@ -89,21 +89,35 @@ class EmailMonitor:
                 logger.error(f"Error in monitor loop: {str(e)}")
                 time.sleep(5)  # Wait before retrying
     
+    def check_now(self):
+        """
+        Public method to manually trigger a check and process cycle.
+        Returns:
+            int: Number of new emails processed
+        """
+        logger.info("Manual check-now triggered")
+        return self._check_and_process()
+
     def _check_and_process(self):
-        """Check for new emails and process them"""
+        """
+        Check for new emails and process them.
+        Returns:
+            int: Number of emails successfully processed
+        """
+        processed_count = 0
         try:
             # Check for new emails
             new_emails = self.email_service.check_new_emails(self.max_emails_per_check)
             
             if not new_emails:
-                return
+                return 0
             
             logger.info(f"Processing {len(new_emails)} new emails")
             
             # Process each email
             for email_data in new_emails:
-                if not self.is_enabled:
-                    logger.info("Auto-reply disabled, stopping processing")
+                if not self.is_enabled and threading.current_thread() == self.monitor_thread:
+                    logger.info("Auto-reply disabled, stopping background processing")
                     break
                 
                 result = self.email_service.process_email(email_data)
@@ -111,15 +125,19 @@ class EmailMonitor:
                 if result['success']:
                     # Add to recent processed list
                     self._add_to_recent(result)
+                    processed_count += 1
                     logger.info(f"Successfully processed email from {result['sender']}")
                 else:
                     logger.error(f"Failed to process email: {result.get('error', 'Unknown error')}")
                 
                 # Small delay between processing emails
                 time.sleep(1)
+            
+            return processed_count
                 
         except Exception as e:
             logger.error(f"Error checking and processing emails: {str(e)}")
+            return 0
     
     def _add_to_recent(self, result):
         """Add processed email to recent list and persist"""
@@ -137,9 +155,16 @@ class EmailMonitor:
         try:
             if os.path.exists(self.history_file):
                 with open(self.history_file, 'r') as f:
-                    return json.load(f)
+                    data = json.load(f)
+                    logger.info(f"Loaded {len(data)} history entries from {self.history_file}")
+                    return data
+        except json.JSONDecodeError:
+            logger.error(f"Error decoding {self.history_file}, possibly corrupted. Resetting history.")
+            # Backup corrupted file
+            if os.path.exists(self.history_file):
+                os.rename(self.history_file, f"{self.history_file}.bak")
         except Exception as e:
-            logger.error(f"Error loading processed history: {str(e)}")
+            logger.error(f"Unexpected error loading processed history: {str(e)}")
         
         return []
     
@@ -148,6 +173,7 @@ class EmailMonitor:
         try:
             with open(self.history_file, 'w') as f:
                 json.dump(self.recent_processed, f)
+            logger.debug(f"Saved {len(self.recent_processed)} history entries to {self.history_file}")
         except Exception as e:
             logger.error(f"Error saving processed history: {str(e)}")
     

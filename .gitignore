@@ -30,3 +30,4 @@ processed_history.json
 # OS
 .DS_Store
 Thumbs.db
+user_settings.json

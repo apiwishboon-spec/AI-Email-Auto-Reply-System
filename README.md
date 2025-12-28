@@ -41,34 +41,27 @@ A production-ready AI-powered email intelligence system with real SMTP/IMAP inte
   - [Outlook App Passwords](https://support.microsoft.com/en-us/office/how-to-get-and-use-app-passwords-58019d14-42a3-4b0d-90fd-569C5C00039A)
 - (Optional) [Ollama](https://ollama.com/) for advanced AI generation.
 
-### Installation
+### 🚀 Quick Start
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/apiwishboon-spec/AI-Email-Auto-Reply-System.git
-   cd AI-Email-Auto-Reply-System
-   ```
+#### 1. Setup & Install
+```bash
+# Clone Repository
+git clone https://github.com/apiwishboon-spec/AI-Email-Auto-Reply-System.git
+cd AI-Email-Auto-Reply-System
 
-2. **Set up Virtual Environment**
-   ```bash
-   # Create virtual environment
-   python -m venv venv
+# Create Virtual Environment & Install
+# Linux/macOS:
+python3 -m venv venv && source venv/bin/activate && pip install -r requirements.txt
 
-   # Activate:
-   source venv/bin/activate       # Mac/Linux
-   .\venv\Scripts\activate        # Windows
+# Windows (PowerShell):
+python -m venv venv; .\venv\Scripts\activate; pip install -r requirements.txt
+```
 
-   # Install:
-   pip install -r requirements.txt
-   ```
-
-4. **Environment Configuration**
-   ```bash
-   # Copy config file
-   cp .env.example .env           # Mac/Linux
-   copy .env.example .env         # Windows
-   ```
-   *Edit `.env` with your App Password and settings.*
+#### 2. Configure
+```bash
+cp .env.example .env  # Windows: copy .env.example .env
+# Edit .env to set preferences (Optional)
+```
 
 ---
 
@@ -83,8 +76,8 @@ A production-ready AI-powered email intelligence system with real SMTP/IMAP inte
 2. **Login**
    Enter your email and the **App Password** you generated.
 
-2. **Auto-Reply**
-   Toggle **ON** in the dashboard to start the AI agent (checks every 30s).
+3. **Start Monitoring**
+   Enable **Auto-Reply** from the dashboard. The system will start checking your inbox every 30 seconds (default).
 
 ---
 

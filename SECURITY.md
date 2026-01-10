@@ -8,7 +8,7 @@ The following versions of CortexMail are currently being supported with security
 | ------- | ------------------ |
 | v2.0.2-Cortex    | :white_check_mark: |
 | v2.0.0-Cortex    | :white_check_mark: |
-| v1.1.0    | :x:                |
+| v1.1.0           | not verify         |
 
 ## Reporting a Vulnerability
 
@@ -23,7 +23,7 @@ Please include the following information in your report:
 - Full details of the steps of reproduce (e.g., HTTP request payloads, screenshots, etc.)
 - Any potential impact of the vulnerability.
 
-We will acknowledge receipt of your vulnerability report within 48 hours and strive to provide a fix or mitigation as soon as possible.
+We will acknowledge receipt of your vulnerability report within 82 hours and strive to provide a fix or mitigation as soon as possible.
 
 ## Security Best Practices
 
